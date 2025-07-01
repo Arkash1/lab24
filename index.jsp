@@ -1,36 +1,48 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Вычисление суммы ряда</title>
+    <title>Лабораторная работа №24</title>
 </head>
 <body>
 <h2>Вычисление суммы ряда</h2>
-<form method="post">
-    Верхний предел (n): <input type="number" name="z" required><br><br>
-    Значение x (x > 0.5): <input type="number" step="any" name="x" required><br><br>
-    <input type="submit" value="Рассчитать">
+<form>
+    Введите предел суммы:
+    <input type="text" name="limit" min="1" required />
+    <br/>
+    Введите x (x &gt; 0):
+    <input type="text" name="x" step="any" min="0.0001" required />
+    <br/>
+    <input type="submit" value="Вычислить" />
 </form>
-
 <%
-if ("POST".equals(request.getMethod())) {
-    try {
-        int z = Integer.parseInt(request.getParameter("z"));
-        double x = Double.parseDouble(request.getParameter("x"));
-        double sum = 0;
+    String limitStr = request.getParameter("limit");
+    String xStr = request.getParameter("x");
 
-        if (x > 0.5) {
-            for (int n = 0; n < z; n++) {
-                double temp = Math.pow(x-1, n+1) / ((n+1) * Math.pow(x+1, n+1));
-                sum += temp;
+    if (limitStr != null && xStr != null) {
+        try {
+            int limit = Integer.parseInt(limitStr);
+            double x = Double.parseDouble(xStr);
+            if (x <= 0 || limit <= 0) {
+%>
+                <p>Нельзя использовать эти данные. Убедитесь, что x &gt; 0 и limit &gt; 0.</p>
+<%
+            } else {
+                double result = 0;
+
+                for (int n = 0; n < limit; n++) {
+                    int power = 2 * n + 1;
+                    result += Math.pow(x - 1, power) / (power * Math.pow(x + 1, power));
+                }
+%>
+                <p>Результат: <%= 2*result %></p>
+<%
             }
-            out.println("<h3>Результат: " + sum + "</h3>");
-        } else {
-            out.println("<p style='color:red'>Ошибка: x должен быть больше 0.5!</p>");
+        } catch (NumberFormatException e) {
+%>
+            <p>Некорректный ввод. Введите числовые значения.</p>
+<%
         }
-    } catch (Exception e) {
-        out.println("<p style='color:red'>Ошибка ввода данных!</p>");
     }
-}
 %>
 </body>
 </html>
